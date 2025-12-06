@@ -14,33 +14,47 @@ const LanguageSwitcher = () => {
                 onClick={() => changeLanguage('en')}
                 style={{
                     background: i18n.language.startsWith('en') ? 'var(--primary)' : 'transparent',
+                    color: i18n.language.startsWith('en') ? 'white' : 'var(--text-secondary)',
                     border: '1px solid var(--border)',
                     borderRadius: '4px',
-                    padding: '4px 8px',
+                    padding: '6px 12px',
                     cursor: 'pointer',
-                    fontSize: '1.2rem',
-                    opacity: i18n.language.startsWith('en') ? 1 : 0.6,
-                    transition: 'all 0.2s'
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s',
+                    flex: 1,
+                    justifyContent: 'center'
                 }}
                 title="English"
             >
-                🇬🇧
+                <span>🇬🇧</span>
+                <span>English</span>
             </button>
             <button
                 onClick={() => changeLanguage('th')}
                 style={{
                     background: i18n.language.startsWith('th') ? 'var(--primary)' : 'transparent',
+                    color: i18n.language.startsWith('th') ? 'white' : 'var(--text-secondary)',
                     border: '1px solid var(--border)',
                     borderRadius: '4px',
-                    padding: '4px 8px',
+                    padding: '6px 12px',
                     cursor: 'pointer',
-                    fontSize: '1.2rem',
-                    opacity: i18n.language.startsWith('th') ? 1 : 0.6,
-                    transition: 'all 0.2s'
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s',
+                    flex: 1,
+                    justifyContent: 'center'
                 }}
                 title="ไทย"
             >
-                🇹🇭
+                <span>🇹🇭</span>
+                <span>Thai</span>
             </button>
         </div>
     );
