@@ -50,15 +50,21 @@
     .calendar-grid {
         font-size: 0.6rem;
         gap: 0px !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        /* Force equal width, ignoring content size */
         width: 100%;
         max-width: 100%;
         padding: 0 !important;
     }
 
-    .calendar-weekday-header {
+    .calendar-day-header {
+        /* Fixed class name was .calendar-weekday-header */
         padding: 4px 1px !important;
         font-size: 0.6rem;
         font-weight: 600;
+        /* Ensure header text doesn't force width */
+        overflow: hidden;
+        text-overflow: clip;
     }
 
     .calendar-day {
