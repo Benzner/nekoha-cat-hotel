@@ -30,7 +30,6 @@ const LanguageSwitcher = () => {
                 }}
                 title="English"
             >
-                <span>🇬🇧</span>
                 <span>English</span>
             </button>
             <button
@@ -53,8 +52,7 @@ const LanguageSwitcher = () => {
                 }}
                 title="ไทย"
             >
-                <span>🇹🇭</span>
-                <span>Thai</span>
+                <span>ไทย</span>
             </button>
         </div>
     );
