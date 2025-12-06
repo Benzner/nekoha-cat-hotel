@@ -1,0 +1,206 @@
+/* Large Desktop: 4 cards per row */
+@media (min-width: 1440px) {
+    .dashboard-summary {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: var(--spacing-md);
+    }
+}
+
+/* Desktop: 3-4 cards per row */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .dashboard-summary {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+/* Small Desktop / Landscape Tablet (769px - 1023px) */
+/* When sidebar is visible (280px), content width is reduced */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .dashboard-summary {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .summary-card {
+        padding: 12px;
+    }
+
+    .summary-value {
+        font-size: 1.25rem;
+    }
+}
+
+/* Tablet / Large Mobile (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .dashboard-summary {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    /* ... rest of existing styles ... */
+
+    .summary-card {
+        min-height: 120px;
+        padding: 10px 12px;
+    }
+
+    .summary-value {
+        font-size: 1.3rem;
+    }
+
+    .summary-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+
+    .summary-label {
+        font-size: 0.65rem;
+    }
+
+    .summary-detail {
+        font-size: 0.7rem;
+    }
+}
+
+/* Mobile: Compact cards with horizontal scroll */
+@media (max-width: 480px) {
+    .dashboard-summary {
+        display: flex;
+        overflow-x: auto;
+        gap: 8px;
+        padding-bottom: 10px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .summary-card {
+        min-width: 140px;
+        max-width: 140px;
+        flex-shrink: 0;
+        min-height: 110px;
+        padding: 8px 10px;
+        scroll-snap-align: start;
+    }
+
+    .summary-value {
+        font-size: 1.2rem;
+    }
+
+    .summary-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+
+    .summary-label {
+        font-size: 10px;
+    }
+
+    .summary-detail {
+        font-size: 9px;
+    }
+
+    .trend-indicator {
+        font-size: 0.65rem;
+        padding: 2px 4px;
+        display: none;
+        /* Hide on very small screens */
+    }
+
+    .progress-bar {
+        height: 3px;
+        margin-top: 6px;
+    }
+
+    /* Date filter mobile styles */
+    .date-filter-section {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+
+    .filter-header h3 {
+        font-size: 13px;
+    }
+
+    .filter-header .filter-icon {
+        font-size: 20px;
+    }
+
+    .filter-buttons {
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+        flex: 0 0 calc(50% - 2.5px);
+    }
+
+    .custom-date-inputs {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .custom-date-inputs label {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .custom-date-inputs input[type="date"] {
+        width: 100%;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    /* Calendar mobile adjustments */
+    .calendar-container {
+        margin-top: 10px;
+    }
+
+    .calendar-header {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+    }
+
+    .calendar-day-number {
+        font-size: 12px;
+    }
+
+    .event-bar {
+        font-size: 9px;
+        padding: 2px 4px;
+        margin-bottom: 2px;
+    }
+
+    .room-filter-btn {
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+}
+
+/* Horizontal scroll styling */
+@media (max-width: 480px) {
+    .dashboard-summary::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .dashboard-summary::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .dashboard-summary::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 3px;
+    }
+
+    .dashboard-summary::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-hover);
+    }
+}

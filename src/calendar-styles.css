@@ -1,0 +1,110 @@
+/* Calendar Container */
+.calendar-container {
+    margin-top: var(--spacing-xl);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.calendar-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.calendar-month {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.calendar-nav {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.calendar-new-reservation-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.calendar-new-reservation-btn .btn-icon {
+    font-size: 1rem;
+}
+
+/* Responsive calendar header */
+@media (max-width: 768px) {
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .calendar-header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .calendar-new-reservation-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Room Type Filter Section */
+.room-filter-section {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.room-filter-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-primary);
+}
+
+.room-filter-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.room-filter-btn.active {
+    color: white;
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
+}
+
+.room-filter-btn.active.standard {
+    background: var(--accent);
+}
+
+.room-filter-btn.active.delux {
+    background: var(--secondary);
+}
+
+.room-filter-btn.active.suite {
+    background: var(--primary);
+}
+
+.room-filter-btn.active:not(.standard):not(.delux):not(.suite) {
+    background: var(--primary);
+}

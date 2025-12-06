@@ -1,0 +1,149 @@
+/* Mobile Calendar Responsive Styles */
+
+/* Tablet and below - make calendar more compact */
+@media (max-width: 768px) {
+    .calendar-grid {
+        font-size: 0.75rem;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 4px;
+    }
+
+    .calendar-day-number {
+        font-size: 0.875rem;
+    }
+
+    .event-bar {
+        font-size: 0.7rem;
+        padding: 3px 5px;
+        margin-bottom: 3px;
+    }
+
+    .calendar-header-left {
+        gap: var(--spacing-sm);
+    }
+
+    .calendar-month {
+        font-size: 1.25rem;
+    }
+}
+
+/* Mobile phones - very compact calendar */
+@media (max-width: 480px) {
+
+    /* Fix container overflow */
+    .calendar-container {
+        margin-top: var(--spacing-md);
+        padding: 0 !important;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .calendar-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .calendar-grid {
+        font-size: 0.6rem;
+        gap: 0px !important;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+
+    .calendar-weekday-header {
+        padding: 4px 1px !important;
+        font-size: 0.6rem;
+        font-weight: 600;
+    }
+
+    .calendar-day {
+        min-height: 55px;
+        padding: 1px !important;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .calendar-day-number {
+        font-size: 0.75rem;
+        padding: 2px 4px;
+        margin-bottom: 2px;
+    }
+
+    .event-bar {
+        font-size: 0.55rem;
+        padding: 2px 3px;
+        margin-bottom: 2px;
+        border-radius: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .more-events {
+        font-size: 0.55rem;
+        padding: 2px;
+    }
+
+    /* Compact calendar header */
+    .calendar-header {
+        margin-bottom: var(--spacing-md);
+        gap: var(--spacing-sm);
+    }
+
+    .calendar-month {
+        font-size: 1rem;
+    }
+
+    .calendar-nav button {
+        padding: 6px 10px;
+        font-size: 0.875rem;
+    }
+
+    .btn.btn-primary {
+        font-size: 0.75rem;
+        padding: 8px 14px;
+    }
+
+    /* Make room filter buttons wrap nicely */
+    .room-filter-section {
+        gap: 5px;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .room-filter-btn {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        flex: 0 0 calc(50% - 2.5px);
+    }
+}
+
+/* Extra small screens - minimal calendar */
+@media (max-width: 360px) {
+    .calendar-day {
+        min-height: 50px;
+    }
+
+    .calendar-day-number {
+        font-size: 0.7rem;
+    }
+
+    .event-bar {
+        font-size: 0.5rem;
+        padding: 1px 2px;
+    }
+
+    .calendar-month {
+        font-size: 0.9rem;
+    }
+
+    .room-filter-btn {
+        font-size: 0.65rem;
+        padding: 5px 8px;
+    }
+}
