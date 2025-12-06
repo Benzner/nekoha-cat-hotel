@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import Dashboard from '../Dashboard/Dashboard';
 import ReservationList from '../Reservations/ReservationList';
 import HistoryList from '../History/HistoryList';
+import LanguageSwitcher from '../Common/LanguageSwitcher';
 
 function MainLayout() {
     const { logout, user } = useAuth();
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -20,7 +23,7 @@ function MainLayout() {
     }, []);
 
     const handleLogout = () => {
-        if (window.confirm('Are you sure you want to logout?')) {
+        if (window.confirm(t('common.confirm_logout'))) {
             logout();
         }
     };
@@ -55,10 +58,10 @@ function MainLayout() {
 
     const getTitle = () => {
         switch (activeTab) {
-            case 'dashboard': return 'Dashboard';
-            case 'reservations': return 'Reservations';
-            case 'history': return 'History';
-            default: return 'Dashboard';
+            case 'dashboard': return t('dashboard.title');
+            case 'reservations': return t('sidebar.reservations');
+            case 'history': return t('sidebar.history');
+            default: return t('dashboard.title');
         }
     };
 
@@ -76,7 +79,7 @@ function MainLayout() {
             <aside className={`app-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
                     <img src="/logo.png" alt="Nekoha Logo" className="app-logo-img" />
-                    <span className="app-brand">Nekoha</span>
+                    <span className="app-brand">Nekoha Cat Hotel</span>
                 </div>
 
                 <nav className="sidebar-nav">
@@ -85,37 +88,41 @@ function MainLayout() {
                         onClick={() => handleNavClick('dashboard')}
                     >
                         <span className="nav-icon">📊</span>
-                        Dashboard
+                        {t('sidebar.dashboard')}
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'reservations' ? 'active' : ''}`}
                         onClick={() => handleNavClick('reservations')}
                     >
                         <span className="nav-icon">📅</span>
-                        Reservations
+                        {t('sidebar.reservations')}
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
                         onClick={() => handleNavClick('history')}
                     >
                         <span className="nav-icon">📜</span>
-                        History
+                        {t('sidebar.history')}
                     </button>
                 </nav>
 
                 <div className="sidebar-footer">
+                    <div style={{ marginBottom: '1rem', padding: '0 0.5rem' }}>
+                        <LanguageSwitcher />
+                    </div>
+
                     <div className="user-profile-mini" style={{ marginBottom: '1rem', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                             {user?.username?.[0]?.toUpperCase() || 'A'}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.username || 'Admin'}</span>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Manager</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('sidebar.manager')}</span>
                         </div>
                     </div>
                     <button className="nav-item" onClick={handleLogout} style={{ color: 'var(--danger)' }}>
                         <span className="nav-icon">🚪</span>
-                        Logout
+                        {t('sidebar.logout')}
                     </button>
                 </div>
             </aside>
@@ -137,19 +144,14 @@ function MainLayout() {
                             onClick={toggleSidebar}
                             aria-label="Toggle menu"
                             style={{
-                                display: 'none', // Hidden by default, shown in media query via CSS if needed, but we used fixed button in CSS. 
-                                // Actually, let's use the CSS class we defined for the fixed button or integrate it here.
-                                // The CSS defines .hamburger-menu as fixed. Let's keep that for now or adjust.
-                                // If we want a proper header bar, we should probably remove the fixed hamburger and put it here.
-                                // But for now, let's stick to the CSS plan which had a fixed hamburger.
-                                // Wait, the CSS has .hamburger-menu as fixed.
+                                display: 'none',
                             }}
                         >
                             Menu
                         </button>
                         <div>
                             <h1 style={{ fontSize: '2rem', fontWeight: '800', margin: 0, letterSpacing: '-0.02em' }}>{getTitle()}</h1>
-                            <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Welcome back, {user?.username || 'Manager'}</p>
+                            <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{t('app.welcome')} {user?.username || 'Manager'}</p>
                         </div>
                     </div>
 

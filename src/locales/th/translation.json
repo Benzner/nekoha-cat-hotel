@@ -1,0 +1,45 @@
+{
+    "app": {
+        "title": "เนโกะฮะ แคท โฮเทล",
+        "welcome": "ยินดีต้อนรับ,"
+    },
+    "sidebar": {
+        "dashboard": "แดชบอร์ด",
+        "reservations": "รายการจอง",
+        "history": "ประวัติ",
+        "logout": "ออกจากระบบ",
+        "manager": "ผู้จัดการ"
+    },
+    "dashboard": {
+        "title": "แดชบอร์ด",
+        "available_rooms": "ห้องว่าง",
+        "booked_rooms": "ห้องที่ถูกจอง",
+        "active_guests": "แมวที่เข้าพัก",
+        "total_rooms": "จากทั้งหมด {{count}} ห้อง",
+        "occupancy_rate": "อัตราการเข้าพัก {{rate}}%",
+        "currently_staying": "กำลังเข้าพักขณะนี้",
+        "filter_period": "เลือกช่วงเวลา",
+        "today": "วันนี้",
+        "this_week": "สัปดาห์นี้",
+        "this_month": "เดือนนี้",
+        "custom_range": "กำหนดเอง",
+        "all_time": "ทั้งหมด",
+        "new_reservation": "จองใหม่"
+    },
+    "calendar": {
+        "all_types": "ทั้งหมด",
+        "standard": "สแตนดาร์ด",
+        "deluxe": "ดีลักซ์",
+        "suite": "สวีท",
+        "today": "วันนี้"
+    },
+    "common": {
+        "loading": "กำลังโหลด...",
+        "close": "ปิด",
+        "cancel": "ยกเลิก",
+        "save": "บันทึก",
+        "delete": "ลบ",
+        "edit": "แก้ไข",
+        "confirm_logout": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?"
+    }
+}

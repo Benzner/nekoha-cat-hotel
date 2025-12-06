@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useReservations } from '../../context/ReservationContext';
 import { formatDate, getMonthData, formatDisplayDate } from '../../utils/dateUtils';
 
 export default function Calendar({ onNewReservation }) {
+    const { t, i18n } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
-    const [filterRoomType, setFilterRoomType] = useState('all');
+    const [filterRoomTypes, setFilterRoomTypes] = useState(['all']);
     const { reservations } = useReservations();
 
     const year = currentDate.getFullYear();
@@ -15,8 +17,8 @@ export default function Calendar({ onNewReservation }) {
 
     const { firstDay, daysInMonth, daysInPrevMonth } = getMonthData(year, month);
 
-    const monthName = currentDate.toLocaleDateString('en-US', {
-        //year: 'numeric', -- Need to show only month name
+    // Use current language for date formatting
+    const monthName = currentDate.toLocaleDateString(i18n.language === 'th' ? 'th-TH' : 'en-US', {
         month: 'long'
     });
 
@@ -49,10 +51,10 @@ export default function Calendar({ onNewReservation }) {
 
     const getRoomLabel = (roomType) => {
         switch (roomType) {
-            case 'suite': return 'Suite';
-            case 'delux': return 'Deluxe';
-            case 'standard': return 'Standard';
-            case 'standard-connecting': return 'Std Connecting';
+            case 'suite': return t('calendar.suite');
+            case 'delux': return t('calendar.deluxe');
+            case 'standard': return t('calendar.standard');
+            case 'standard-connecting': return `${t('calendar.standard')} (C)`;
             default: return roomType;
         }
     };
@@ -72,6 +74,26 @@ export default function Calendar({ onNewReservation }) {
         setSelectedDay(null);
     };
 
+    const toggleFilter = (type) => {
+        setFilterRoomTypes(prev => {
+            if (type === 'all') return ['all'];
+
+            // If currently 'all', remove it and start strict list
+            let newFilters = prev.includes('all') ? [] : [...prev];
+
+            if (newFilters.includes(type)) {
+                newFilters = newFilters.filter(t => t !== type);
+            } else {
+                newFilters.push(type);
+            }
+
+            // If empty, revert to 'all'
+            if (newFilters.length === 0) return ['all'];
+
+            return newFilters;
+        });
+    };
+
     const renderDay = (date, isOtherMonth = false) => {
         const dateStr = formatDate(date);
         const isToday = date.toDateString() === today.toDateString();
@@ -79,7 +101,18 @@ export default function Calendar({ onNewReservation }) {
         // Find reservations for this day
         const dayReservations = reservations
             .filter(res => isBookedOnDay(date, res))
-            .filter(res => filterRoomType === 'all' || res.roomType === filterRoomType);
+            .filter(res => {
+                if (filterRoomTypes.includes('all')) return true;
+
+                // Check if reservation matches any active filter
+                // Special case: 'standard' filter matches BOTH 'standard' and 'standard-connecting'
+                if (filterRoomTypes.includes('standard') && (res.roomType === 'standard' || res.roomType === 'standard-connecting')) {
+                    return true;
+                }
+
+                // Normal match
+                return filterRoomTypes.includes(res.roomType);
+            });
 
         // Sort by room type to keep consistent order visually
         dayReservations.sort((a, b) => a.roomType.localeCompare(b.roomType));
@@ -153,47 +186,41 @@ export default function Calendar({ onNewReservation }) {
                         <h2 className="calendar-month">{monthName} {year}</h2>
                         <div className="calendar-nav">
                             <button className="btn btn-outline btn-sm" onClick={handlePrevMonth}>←</button>
-                            <button className="btn btn-outline btn-sm" onClick={handleToday}>Today</button>
+                            <button className="btn btn-outline btn-sm" onClick={handleToday}>{t('calendar.today')}</button>
                             <button className="btn btn-outline btn-sm" onClick={handleNextMonth}>→</button>
                         </div>
                     </div>
                     <button className="btn btn-primary btn-sm calendar-new-reservation-btn" onClick={onNewReservation}>
                         <span className="btn-icon">➕</span>
-                        New Reservation
+                        {t('dashboard.new_reservation')}
                     </button>
                 </div>
 
                 {/* Room Type Filters */}
                 <div className="room-filter-section">
                     <button
-                        className={`room-filter-btn ${filterRoomType === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilterRoomType('all')}
+                        className={`room-filter-btn ${filterRoomTypes.includes('all') ? 'active' : ''}`}
+                        onClick={() => toggleFilter('all')}
                     >
-                        All Types
+                        {t('calendar.all_types')}
                     </button>
                     <button
-                        className={`room-filter-btn standard ${filterRoomType === 'standard' ? 'active' : ''}`}
-                        onClick={() => setFilterRoomType('standard')}
+                        className={`room-filter-btn standard ${filterRoomTypes.includes('standard') ? 'active' : ''}`}
+                        onClick={() => toggleFilter('standard')}
                     >
-                        🛏️ Standard
+                        🛏️ {t('calendar.standard')}
                     </button>
                     <button
-                        className={`room-filter-btn standard ${filterRoomType === 'standard-connecting' ? 'active' : ''}`}
-                        onClick={() => setFilterRoomType('standard-connecting')}
+                        className={`room-filter-btn delux ${filterRoomTypes.includes('delux') ? 'active' : ''}`}
+                        onClick={() => toggleFilter('delux')}
                     >
-                        🔗 Standard Connecting
+                        👑 {t('calendar.deluxe')}
                     </button>
                     <button
-                        className={`room-filter-btn delux ${filterRoomType === 'delux' ? 'active' : ''}`}
-                        onClick={() => setFilterRoomType('delux')}
+                        className={`room-filter-btn suite ${filterRoomTypes.includes('suite') ? 'active' : ''}`}
+                        onClick={() => toggleFilter('suite')}
                     >
-                        👑 Deluxe
-                    </button>
-                    <button
-                        className={`room-filter-btn suite ${filterRoomType === 'suite' ? 'active' : ''}`}
-                        onClick={() => setFilterRoomType('suite')}
-                    >
-                        💎 Suite
+                        💎 {t('calendar.suite')}
                     </button>
                 </div>
 

@@ -1,0 +1,45 @@
+{
+    "app": {
+        "title": "Nekoha Cat Hotel",
+        "welcome": "Welcome back,"
+    },
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "reservations": "Reservations",
+        "history": "History",
+        "logout": "Logout",
+        "manager": "Manager"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "available_rooms": "Available Rooms",
+        "booked_rooms": "Booked Rooms",
+        "active_guests": "Active Guests",
+        "total_rooms": "out of {{count}} total rooms",
+        "occupancy_rate": "{{rate}}% occupancy rate",
+        "currently_staying": "currently staying",
+        "filter_period": "Filter Period",
+        "today": "Today",
+        "this_week": "This Week",
+        "this_month": "This Month",
+        "custom_range": "Custom Range",
+        "all_time": "All Time",
+        "new_reservation": "New Reservation"
+    },
+    "calendar": {
+        "all_types": "All Types",
+        "standard": "Standard",
+        "deluxe": "Deluxe",
+        "suite": "Suite",
+        "today": "Today"
+    },
+    "common": {
+        "loading": "Loading...",
+        "close": "Close",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "confirm_logout": "Are you sure you want to logout?"
+    }
+}

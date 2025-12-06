@@ -1,8 +1,10 @@
 import { useReservations } from '../../context/ReservationContext';
 import { getRoomAvailability } from '../../utils/roomUtils';
 import SkeletonCard from '../Common/SkeletonCard';
+import { useTranslation } from 'react-i18next';
 
 export default function SummaryCards({ reservations: reservationsProp }) {
+    const { t } = useTranslation();
     const { reservations: contextReservations, isLoading } = useReservations();
 
     // Use prop if provided, otherwise use context
@@ -46,9 +48,9 @@ export default function SummaryCards({ reservations: reservationsProp }) {
             {/* Available Rooms Card with Icon */}
             <div className="summary-card available animate-in">
                 <div className="summary-icon">🏠</div>
-                <div className="summary-label">Available Rooms</div>
+                <div className="summary-label">{t('dashboard.available_rooms')}</div>
                 <div className="summary-value">{totalAvailable}</div>
-                <div className="summary-detail">out of {totalRooms} total rooms</div>
+                <div className="summary-detail">{t('dashboard.total_rooms', { count: totalRooms })}</div>
                 <div className="progress-bar">
                     <div
                         className="progress-fill available-fill"
@@ -60,9 +62,9 @@ export default function SummaryCards({ reservations: reservationsProp }) {
             {/* Booked Rooms Card with Icon */}
             <div className="summary-card booked animate-in" style={{ animationDelay: '0.1s' }}>
                 <div className="summary-icon">🐱</div>
-                <div className="summary-label">Booked Rooms</div>
+                <div className="summary-label">{t('dashboard.booked_rooms')}</div>
                 <div className="summary-value">{totalBooked}</div>
-                <div className="summary-detail">{occupancyRate}% occupancy rate</div>
+                <div className="summary-detail">{t('dashboard.occupancy_rate', { rate: occupancyRate })}</div>
                 <div className="progress-bar">
                     <div
                         className="progress-fill booked-fill"
@@ -78,9 +80,9 @@ export default function SummaryCards({ reservations: reservationsProp }) {
             {/* Active Guests Card */}
             <div className="summary-card animate-in" style={{ animationDelay: '0.2s' }}>
                 <div className="summary-icon">✨</div>
-                <div className="summary-label">Active Guests</div>
+                <div className="summary-label">{t('dashboard.active_guests')}</div>
                 <div className="summary-value">{activeReservations}</div>
-                <div className="summary-detail">currently staying</div>
+                <div className="summary-detail">{t('dashboard.currently_staying')}</div>
                 <div className="trend-indicator neutral">
                     <span className="trend-arrow">→</span>
                     <span className="trend-text">Same as yesterday</span>

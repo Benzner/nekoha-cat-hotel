@@ -4,9 +4,11 @@ import { useState, useMemo } from 'react';
 import ReservationModal from '../Reservations/ReservationModal';
 import { useReservations } from '../../context/ReservationContext';
 import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from 'react-i18next';
 import './dashboard-filter.css';
 
 export default function Dashboard() {
+    const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dateFilter, setDateFilter] = useState('all'); // 'today', 'week', 'month', 'custom', 'all'
     const [customStartDate, setCustomStartDate] = useState('');
@@ -62,7 +64,7 @@ export default function Dashboard() {
             <div className="date-filter-section">
                 <div className="filter-header">
                     <span className="filter-icon">📅</span>
-                    <h3>Filter Period</h3>
+                    <h3>{t('dashboard.filter_period')}</h3>
                 </div>
 
                 <div className="filter-buttons">
@@ -70,31 +72,31 @@ export default function Dashboard() {
                         className={`filter-btn ${dateFilter === 'today' ? 'active' : ''}`}
                         onClick={() => setDateFilter('today')}
                     >
-                        Today
+                        {t('dashboard.today')}
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'week' ? 'active' : ''}`}
                         onClick={() => setDateFilter('week')}
                     >
-                        This Week
+                        {t('dashboard.this_week')}
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'month' ? 'active' : ''}`}
                         onClick={() => setDateFilter('month')}
                     >
-                        This Month
+                        {t('dashboard.this_month')}
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'custom' ? 'active' : ''}`}
                         onClick={() => setDateFilter('custom')}
                     >
-                        Custom Range
+                        {t('dashboard.custom_range')}
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'all' ? 'active' : ''}`}
                         onClick={() => setDateFilter('all')}
                     >
-                        All Time
+                        {t('dashboard.all_time')}
                     </button>
                 </div>
 
