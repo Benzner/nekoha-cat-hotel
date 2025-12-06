@@ -1,14 +1,40 @@
 /* Mobile Calendar Responsive Styles */
 
 /* Tablet and below - make calendar more compact */
-@media (max-width: 768px) {
+/* Tablet and below - make calendar more compact */
+@media (max-width: 1024px) {
+
+    /* CRITICAL: Reset Container & Card Padding to maximize space */
+    .calendar-container.card {
+        padding: 8px !important;
+        margin-top: 10px;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
     .calendar-grid {
         font-size: 0.75rem;
+        /* Force grid to stay inside container */
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    }
+
+    .calendar-day-header {
+        padding: 4px 2px;
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .calendar-day {
         min-height: 80px;
         padding: 4px;
+        overflow: hidden;
+        /* Prevent content from expanding cell */
     }
 
     .calendar-day-number {
@@ -17,8 +43,12 @@
 
     .event-bar {
         font-size: 0.7rem;
-        padding: 3px 5px;
+        padding: 3px 4px;
         margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .calendar-header-left {
