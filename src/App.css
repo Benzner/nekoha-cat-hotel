@@ -243,9 +243,13 @@ button {
 /* Main Content */
 .main-content {
     flex: 1;
+    min-width: 0;
+    /* Allow flex item to shrink below content size */
     margin-left: 280px;
     padding: var(--spacing-xl);
     transition: var(--transition);
+    overflow-x: hidden;
+    /* Prevent horizontal overflow */
 }
 
 /* ===========================
@@ -472,6 +476,10 @@ button {
     flex-direction: column;
     transition: var(--transition);
     cursor: pointer;
+    min-width: 0;
+    /* Critical for grid item truncation */
+    overflow: hidden;
+    /* Ensure content stays inside */
 }
 
 .calendar-day:hover {

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useReservations } from '../../context/ReservationContext';
 import { formatDate, isDateInRange } from '../../utils/dateUtils';
 import { getRoomAvailability } from '../../utils/roomUtils';
+import { supabase } from '../../supabaseClient';
 
 export default function ReservationModal({ isOpen, onClose, reservation, onSuccess }) {
     const { saveReservation, reservations } = useReservations();
@@ -13,35 +14,202 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
         bookerContact: '',
         catName: '',
         catDetails: '',
+        customerId: null,
+        catId: null,
         checkIn: '',
         checkOut: '',
         roomType: '',
         roomNumber: '',
-        notes: ''
+        notes: '',
+        totalPrice: 0
     });
 
+    const [customers, setCustomers] = useState([]);
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCatIds, setSelectedCatIds] = useState([]);
+    const [roomRates, setRoomRates] = useState({});
+
+    // Fetch dependencies when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            fetchCustomers();
+            fetchRoomRates();
+            // Reset local states
+            setCustomerSearch('');
+            setShowCustomerDropdown(false);
+            setSelectedCatIds([]);
+        }
+    }, [isOpen]);
+
+    // Handle initial data when 'reservation' prop changes
     useEffect(() => {
         if (reservation) {
             setFormData(reservation);
+            // If we have a catId from DB, set it in array for highlighting
+            if (reservation.catId) {
+                setSelectedCatIds([reservation.catId]);
+            }
+            // We might want to find the customer here if we had customerId in reservation
+            // But strict requirement wasn't clear, assuming booking flow sets it.
         } else {
+            // Reset form for new reservation
             setFormData({
                 id: '',
                 bookerName: '',
                 bookerContact: '',
                 catName: '',
                 catDetails: '',
+                customerId: null,
+                catId: null,
                 checkIn: '',
                 checkOut: '',
                 roomType: '',
                 roomNumber: '',
-                notes: ''
+                notes: '',
+                totalPrice: 0
             });
+            setSelectedCustomer(null);
+            setCustomerSearch('');
+            setSelectedCatIds([]);
         }
     }, [reservation]);
+
+    // Recalculate price when dates or room type change
+    useEffect(() => {
+        if (formData.checkIn && formData.checkOut && formData.roomType && roomRates[formData.roomType]) {
+            const start = new Date(formData.checkIn);
+            const end = new Date(formData.checkOut);
+
+            // Validate dates
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+                if (nights > 0) {
+                    const pricePerNight = roomRates[formData.roomType];
+                    setFormData(prev => ({ ...prev, totalPrice: nights * pricePerNight }));
+                } else {
+                    setFormData(prev => ({ ...prev, totalPrice: 0 }));
+                }
+            }
+
+        }
+    }, [formData.checkIn, formData.checkOut, formData.roomType, roomRates]);
+
+    const fetchCustomers = async () => {
+        try {
+            const { data, error } = await supabase.from('customers').select('*, cats(*)');
+            if (error) throw error;
+            setCustomers(data || []);
+        } catch (err) {
+            console.error("Error fetching customers:", err);
+            setCustomers([]);
+        }
+    };
+
+    const fetchRoomRates = async () => {
+        try {
+            const { data, error } = await supabase.from('room_rates').select('*');
+            if (error) throw error;
+            if (data) {
+                const rates = {};
+                data.forEach(r => rates[r.room_type] = r.price);
+                setRoomRates(rates);
+            }
+        } catch (err) {
+            console.error("Error fetching rates:", err);
+        }
+    };
+
+    const handleCustomerSearchChange = (e) => {
+        setCustomerSearch(e.target.value);
+        setShowCustomerDropdown(true);
+    };
+
+    const selectCustomer = (customer) => {
+        setSelectedCustomer(customer);
+        setCustomerSearch(customer.full_name || '');
+        setShowCustomerDropdown(false);
+        setSelectedCatIds([]); // Reset cats when customer changes
+
+        setFormData(prev => ({
+            ...prev,
+            customerId: customer.id,
+            bookerName: customer.full_name || '',
+            bookerContact: customer.phone || '',
+            catId: null, // Reset cat
+            catName: '',
+            catDetails: ''
+        }));
+    };
+
+    const clearCustomerSelection = () => {
+        setSelectedCustomer(null);
+        setCustomerSearch('');
+        setSelectedCatIds([]);
+        setFormData(prev => ({
+            ...prev,
+            customerId: null,
+            bookerName: '',
+            bookerContact: '',
+            catId: null,
+            catName: '',
+            catDetails: ''
+        }));
+    };
+
+    const handleCatSelect = (cat) => {
+        let newSelectedIds;
+
+        if (selectedCatIds.includes(cat.id)) {
+            // Deselect
+            newSelectedIds = selectedCatIds.filter(id => id !== cat.id);
+        } else {
+            // Select
+            newSelectedIds = [...selectedCatIds, cat.id];
+        }
+
+        setSelectedCatIds(newSelectedIds);
+
+        // Regenerate catName and catDetails based on ALL selected cats
+        if (selectedCustomer && selectedCustomer.cats) {
+            const selectedCats = selectedCustomer.cats.filter(c => newSelectedIds.includes(c.id));
+
+            const names = selectedCats.map(c => c.name).join(', ');
+
+            const details = selectedCats.map(c => {
+                const lines = [
+                    `[${c.name}]`,
+                    c.breed ? `Breed: ${c.breed}` : '',
+                    c.gender ? `Gender: ${c.gender}` : '',
+                    c.medical_notes ? `Medical: ${c.medical_notes}` : '',
+                    c.dietary_notes ? `Diet: ${c.dietary_notes}` : '',
+                    c.personality_notes ? `Personality: ${c.personality_notes}` : ''
+                ].filter(Boolean).join('\n');
+                return lines;
+            }).join('\n\n---\n\n');
+
+            setFormData(prev => ({
+                ...prev,
+                // If multiple cats, we can't really store a single 'catId'. 
+                // We'll store the FIRST one just to have a link, or null. 
+                // Let's store the first one so at least one link doesn't hurt.
+                catId: newSelectedIds.length > 0 ? newSelectedIds[0] : null,
+                catName: names,
+                catDetails: details
+            }));
+        }
+    };
 
     // Check if room is available for the selected dates
     const isRoomAvailableForDates = (roomNumber, checkIn, checkOut) => {
         if (!checkIn || !checkOut) return true;
+
+        // Ensure valid dates
+        const checkInDate = new Date(checkIn);
+        const checkOutDate = new Date(checkOut);
+        if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) return false;
 
         // Get all reservations that overlap with selected dates
         const conflictingReservations = reservations.filter(res => {
@@ -96,9 +264,15 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
         })();
 
         // Filter out unavailable rooms based on selected dates
-        return allRooms.filter(room =>
-            isRoomAvailableForDates(room, formData.checkIn, formData.checkOut)
-        );
+        // Add safety check around filter
+        try {
+            return allRooms.filter(room =>
+                isRoomAvailableForDates(room, formData.checkIn, formData.checkOut)
+            );
+        } catch (e) {
+            console.error("Error filtering rooms", e);
+            return allRooms;
+        }
     };
 
     const handleChange = (e) => {
@@ -115,13 +289,20 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
             setFormData(prev => ({ ...prev, [name]: value }));
         }
 
-        // Update check-out min when check-in changes
+        // Update check-out min when check-in changes (Standard behavior is usually at least 1 night)
+        // User requested removing restriction on DATES (allowing past dates), 
+        // but physically CheckOut must still be > CheckIn for calculation logic.
         if (name === 'checkIn' && value) {
-            const minCheckOut = new Date(value);
-            minCheckOut.setDate(minCheckOut.getDate() + 1);
-            const minDateStr = formatDate(minCheckOut);
-            if (formData.checkOut < minDateStr) {
-                setFormData(prev => ({ ...prev, checkOut: minDateStr }));
+            const start = new Date(value);
+            if (!isNaN(start.getTime())) {
+                const minCheckOutDate = new Date(start);
+                minCheckOutDate.setDate(minCheckOutDate.getDate() + 1);
+                const minDateStr = formatDate(minCheckOutDate);
+
+                // Just ensure check-out isn't BEFORE check-in
+                if (formData.checkOut && formData.checkOut <= value) {
+                    setFormData(prev => ({ ...prev, checkOut: minDateStr }));
+                }
             }
         }
     };
@@ -131,6 +312,8 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
 
         const checkIn = new Date(formData.checkIn);
         const checkOut = new Date(formData.checkOut);
+
+        if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) return false;
 
         for (let d = new Date(checkIn); d < checkOut; d.setDate(d.getDate() + 1)) {
             const availability = getRoomAvailability(d, reservations);
@@ -181,28 +364,31 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
         saveReservation(formData);
         alert('✅ Reservation saved successfully!');
 
-        // Reset form to initial empty state
-        setFormData({
-            id: '',
-            bookerName: '',
-            bookerContact: '',
-            catName: '',
-            catDetails: '',
-            checkIn: '',
-            checkOut: '',
-            roomType: '',
-            roomNumber: '',
-            notes: ''
-        });
-
         onClose();
         if (onSuccess) onSuccess();
     };
 
     if (!isOpen) return null;
 
-    const today = formatDate(new Date());
-    const minCheckOut = formData.checkIn ? formatDate(new Date(new Date(formData.checkIn).getTime() + 86400000)) : today;
+    // Safe filtering of customers
+    const filteredCustomers = customers.filter(c => {
+        if (!c || !c.full_name) return false;
+        const search = (customerSearch || '').toLowerCase();
+        const name = c.full_name.toLowerCase();
+        const phone = c.phone || '';
+        return name.includes(search) || phone.includes(search);
+    });
+
+    // Determine min date for checkOut input (purely for UI guidance, not strict blocking if user wants manual override)
+    // We already removed min={today} for checkIn.
+    let minCheckOut = undefined;
+    if (formData.checkIn) {
+        const d = new Date(formData.checkIn);
+        if (!isNaN(d.getTime())) {
+            d.setDate(d.getDate() + 1);
+            minCheckOut = formatDate(d);
+        }
+    }
 
     return createPortal(
         <div className="modal active">
@@ -214,6 +400,86 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
+                        {/* Customer Searchable Dropdown */}
+                        <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #e2e8f0', position: 'relative' }}>
+                            <label className="form-label" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>👤 Select Registered Customer</label>
+
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Search name or phone..."
+                                    value={customerSearch}
+                                    onChange={handleCustomerSearchChange}
+                                    onFocus={() => setShowCustomerDropdown(true)}
+                                    onBlur={() => setTimeout(() => setShowCustomerDropdown(false), 200)}
+                                />
+                                {selectedCustomer && (
+                                    <button
+                                        type="button"
+                                        onClick={clearCustomerSelection}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '10px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: '#94a3b8',
+                                            fontSize: '1.2rem'
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Dropdown List */}
+                            {showCustomerDropdown && customerSearch && !selectedCustomer && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: '1rem',
+                                    right: '1rem',
+                                    background: 'white',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: '0 0 8px 8px',
+                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                                    zIndex: 100,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto'
+                                }}>
+                                    {filteredCustomers.length > 0 ? (
+                                        filteredCustomers.map(c => (
+                                            <div
+                                                key={c.id}
+                                                onClick={() => selectCustomer(c)}
+                                                style={{
+                                                    padding: '0.75rem 1rem',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    transition: 'background 0.2s',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center'
+                                                }}
+                                                onMouseEnter={(e) => e.target.style.background = '#f8fafc'}
+                                                onMouseLeave={(e) => e.target.style.background = 'white'}
+                                            >
+                                                <span style={{ fontWeight: 500 }}>{c.full_name}</span>
+                                                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{c.phone}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div style={{ padding: '1rem', color: '#94a3b8', textAlign: 'center' }}>
+                                            No customers found
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
                         <div className="form-group">
                             <label className="form-label" htmlFor="bookerName">Booker Name *</label>
                             <input
@@ -225,6 +491,8 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
                                 value={formData.bookerName}
                                 onChange={handleChange}
                                 required
+                                readOnly={!!formData.customerId}
+                                style={formData.customerId ? { background: '#f1f5f9' } : {}}
                             />
                         </div>
 
@@ -239,8 +507,52 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
                                 value={formData.bookerContact}
                                 onChange={handleChange}
                                 required
+                                readOnly={!!formData.customerId}
+                                style={formData.customerId ? { background: '#f1f5f9' } : {}}
                             />
                         </div>
+
+                        {/* Cat Selection if Customer Selected */}
+                        {formData.customerId && selectedCustomer?.cats?.length > 0 && (
+                            <div className="form-group" style={{
+                                padding: '0.75rem',
+                                background: '#f8fafc',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '6px',
+                                marginBottom: '1rem'
+                            }}>
+                                <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                                    📋 Registered Cats (Select to Auto-fill):
+                                </label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                    {selectedCustomer.cats.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            className="cat-tag"
+                                            onClick={() => handleCatSelect(cat)}
+                                            style={{
+                                                background: selectedCatIds.includes(cat.id) ? '#0369a1' : '#e0f2fe',
+                                                color: selectedCatIds.includes(cat.id) ? 'white' : '#0369a1',
+                                                padding: '4px 12px',
+                                                borderRadius: '16px',
+                                                fontSize: '0.85rem',
+                                                border: '1px solid #bae6fd',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            <span>🐱</span>
+                                            {cat.name}
+                                            {selectedCatIds.includes(cat.id) && <span>✓</span>}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="catName">Cat Name *</label>
@@ -278,7 +590,6 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
                                     className="form-input"
                                     value={formData.checkIn}
                                     onChange={handleChange}
-                                    min={today}
                                     required
                                 />
                             </div>
@@ -309,10 +620,10 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
                                 required
                             >
                                 <option value="">Select room type</option>
-                                <option value="standard">Standard Room (4 available)</option>
-                                <option value="standard-connecting">Standard Connecting (2 rooms - for pairs)</option>
-                                <option value="delux">Private Delux (2 available)</option>
-                                <option value="suite">Suite (2 available)</option>
+                                <option value="standard">Standard Room ({roomRates['standard'] ? `฿${roomRates['standard']}` : 'Loading...'})</option>
+                                <option value="standard-connecting">Standard Connecting ({roomRates['standard-connecting'] ? `฿${roomRates['standard-connecting']}` : ''})</option>
+                                <option value="delux">Private Delux ({roomRates['delux'] ? `฿${roomRates['delux']}` : ''})</option>
+                                <option value="suite">Suite ({roomRates['suite'] ? `฿${roomRates['suite']}` : ''})</option>
                             </select>
                         </div>
 
@@ -333,6 +644,25 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
                                 ))}
                             </select>
                         </div>
+
+                        {/* Price Display */}
+                        {formData.totalPrice > 0 && (
+                            <div className="price-display" style={{
+                                padding: '1rem',
+                                background: '#f0fdf4',
+                                border: '1px solid #86efac',
+                                borderRadius: '8px',
+                                marginBottom: '1rem',
+                                color: '#166534',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <span>Estimated Total:</span>
+                                <span style={{ fontSize: '1.25rem' }}>฿{formData.totalPrice.toLocaleString()}</span>
+                            </div>
+                        )}
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="notes">Special Notes</label>

@@ -4,10 +4,13 @@ import { useTranslation } from 'react-i18next';
 import Dashboard from '../Dashboard/Dashboard';
 import ReservationList from '../Reservations/ReservationList';
 import HistoryList from '../History/HistoryList';
+import CustomerList from '../Customers/CustomerList';
+import Settings from '../Settings/Settings';
+import RoomRatesSettings from '../Admin/RoomRatesSettings';
 import LanguageSwitcher from '../Common/LanguageSwitcher';
 
 function MainLayout() {
-    const { logout, user } = useAuth();
+    const { logout, user, isAdmin } = useAuth();
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -49,8 +52,14 @@ function MainLayout() {
                 return <Dashboard />;
             case 'reservations':
                 return <ReservationList />;
+            case 'customers':
+                return <CustomerList />;
             case 'history':
                 return <HistoryList />;
+            case 'room-rates':
+                return <RoomRatesSettings />;
+            case 'settings':
+                return <Settings />;
             default:
                 return <Dashboard />;
         }
@@ -60,7 +69,11 @@ function MainLayout() {
         switch (activeTab) {
             case 'dashboard': return t('dashboard.title');
             case 'reservations': return t('sidebar.reservations');
+            case 'customers': return 'Customers';
+
             case 'history': return t('sidebar.history');
+            case 'room-rates': return 'Room Rates';
+            case 'settings': return 'Settings';
             default: return t('dashboard.title');
         }
     };
@@ -98,11 +111,34 @@ function MainLayout() {
                         {t('sidebar.reservations')}
                     </button>
                     <button
+                        className={`nav-item ${activeTab === 'customers' ? 'active' : ''}`}
+                        onClick={() => handleNavClick('customers')}
+                    >
+                        <span className="nav-icon">👥</span>
+                        Customers
+                    </button>
+                    <button
                         className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
                         onClick={() => handleNavClick('history')}
                     >
                         <span className="nav-icon">📜</span>
                         {t('sidebar.history')}
+                    </button>
+
+                    <button
+                        className={`nav-item ${activeTab === 'room-rates' ? 'active' : ''}`}
+                        onClick={() => handleNavClick('room-rates')}
+                    >
+                        <span className="nav-icon">💰</span>
+                        Rates
+                    </button>
+
+                    <button
+                        className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => handleNavClick('settings')}
+                    >
+                        <span className="nav-icon">⚙️</span>
+                        Settings
                     </button>
                 </nav>
 
@@ -117,7 +153,7 @@ function MainLayout() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>{user?.username || 'Admin'}</span>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('sidebar.manager')}</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{isAdmin ? 'Admin' : t('sidebar.manager')}</span>
                         </div>
                     </div>
                     <button className="nav-item" onClick={handleLogout} style={{ color: 'var(--danger)' }}>
