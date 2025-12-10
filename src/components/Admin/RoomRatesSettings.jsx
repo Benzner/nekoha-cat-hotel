@@ -44,9 +44,15 @@ export default function RoomRatesSettings() {
             const rateToUpdate = rates.find(r => r.room_type === roomType);
             if (!rateToUpdate) return;
 
+            // Ensure price is a number
+            const price = parseFloat(rateToUpdate.price);
+            if (isNaN(price)) {
+                throw new Error('Invalid price value');
+            }
+
             const { error } = await supabase
                 .from('room_rates')
-                .update({ price: rateToUpdate.price, updated_at: new Date().toISOString() })
+                .update({ price: price, updated_at: new Date().toISOString() })
                 .eq('room_type', roomType);
 
             if (error) throw error;

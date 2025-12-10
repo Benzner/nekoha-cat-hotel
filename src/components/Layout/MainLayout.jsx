@@ -5,7 +5,6 @@ import Dashboard from '../Dashboard/Dashboard';
 import ReservationList from '../Reservations/ReservationList';
 import HistoryList from '../History/HistoryList';
 import CustomerList from '../Customers/CustomerList';
-import Settings from '../Settings/Settings';
 import RoomRatesSettings from '../Admin/RoomRatesSettings';
 import LanguageSwitcher from '../Common/LanguageSwitcher';
 
@@ -58,8 +57,6 @@ function MainLayout() {
                 return <HistoryList />;
             case 'room-rates':
                 return <RoomRatesSettings />;
-            case 'settings':
-                return <Settings />;
             default:
                 return <Dashboard />;
         }
@@ -73,7 +70,6 @@ function MainLayout() {
 
             case 'history': return t('sidebar.history');
             case 'room-rates': return 'Room Rates';
-            case 'settings': return 'Settings';
             default: return t('dashboard.title');
         }
     };
@@ -133,13 +129,6 @@ function MainLayout() {
                         Rates
                     </button>
 
-                    <button
-                        className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => handleNavClick('settings')}
-                    >
-                        <span className="nav-icon">⚙️</span>
-                        Settings
-                    </button>
                 </nav>
 
                 <div className="sidebar-footer">
