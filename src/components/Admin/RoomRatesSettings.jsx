@@ -58,6 +58,7 @@ export default function RoomRatesSettings() {
             if (error) throw error;
 
             setMessage({ type: 'success', text: `Successfully updated ${roomType} rate!` });
+            console.log(`Rate saved successfully for ${roomType}. New price: ${price}`);
 
             // Clear message after 3 seconds
             setTimeout(() => setMessage(null), 3000);

@@ -78,6 +78,14 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
 
     // Recalculate price when dates or room type change
     useEffect(() => {
+        // Debug log for price calculation
+        console.log('Calculating price...', {
+            checkIn: formData.checkIn,
+            checkOut: formData.checkOut,
+            roomType: formData.roomType,
+            rate: roomRates[formData.roomType]
+        });
+
         if (formData.checkIn && formData.checkOut && formData.roomType && roomRates[formData.roomType]) {
             const start = new Date(formData.checkIn);
             const end = new Date(formData.checkOut);
@@ -88,6 +96,7 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
 
                 if (nights > 0) {
                     const pricePerNight = roomRates[formData.roomType];
+                    console.log(`Price calculation: ${nights} nights * ${pricePerNight} = ${nights * pricePerNight}`);
                     setFormData(prev => ({ ...prev, totalPrice: nights * pricePerNight }));
                 } else {
                     setFormData(prev => ({ ...prev, totalPrice: 0 }));
@@ -110,11 +119,14 @@ export default function ReservationModal({ isOpen, onClose, reservation, onSucce
 
     const fetchRoomRates = async () => {
         try {
+            console.log('Fetching room rates in ReservationModal...');
             const { data, error } = await supabase.from('room_rates').select('*');
             if (error) throw error;
+            console.log('Fetched room rates:', data);
             if (data) {
                 const rates = {};
                 data.forEach(r => rates[r.room_type] = r.price);
+                console.log('Processed rates map:', rates);
                 setRoomRates(rates);
             }
         } catch (err) {

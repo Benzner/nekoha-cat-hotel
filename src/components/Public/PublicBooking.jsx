@@ -25,10 +25,13 @@ export default function PublicBooking() {
     }, []);
 
     const fetchRoomRates = async () => {
+        console.log("PublicBooking: Fetching room rates...");
         const { data } = await supabase.from('room_rates').select('*');
         if (data) {
+            console.log("PublicBooking: Raw rates data:", data);
             const rates = {};
             data.forEach(r => rates[r.room_type] = r.price);
+            console.log("PublicBooking: Mapped rates:", rates);
             setRoomRates(rates);
         }
     };
@@ -44,7 +47,9 @@ export default function PublicBooking() {
         const end = new Date(formData.checkOut);
         const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
         if (nights <= 0) return 0;
-        return nights * (roomRates[formData.roomType] || 0);
+        const rate = roomRates[formData.roomType] || 0;
+        console.log(`Calculating total: ${nights} nights * ${rate} (Rate for ${formData.roomType})`);
+        return nights * rate;
     };
 
     const handleSubmit = async (e) => {
