@@ -53,7 +53,7 @@ export default function RoomRatesSettings() {
             const { error } = await supabase
                 .from('room_rates')
                 .update({ price: price, updated_at: new Date().toISOString() })
-                .eq('room_type', roomType);
+                .eq('id', rateToUpdate.id);
 
             if (error) throw error;
 
