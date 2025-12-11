@@ -6,6 +6,7 @@ import ReservationList from '../Reservations/ReservationList';
 import HistoryList from '../History/HistoryList';
 import CustomerList from '../Customers/CustomerList';
 import RoomRatesSettings from '../Admin/RoomRatesSettings';
+import EmployeeSchedule from '../Admin/EmployeeSchedule';
 import LanguageSwitcher from '../Common/LanguageSwitcher';
 
 function MainLayout() {
@@ -57,6 +58,8 @@ function MainLayout() {
                 return <HistoryList />;
             case 'room-rates':
                 return <RoomRatesSettings />;
+            case 'staff-schedule':
+                return <EmployeeSchedule />;
             default:
                 return <Dashboard />;
         }
@@ -70,6 +73,7 @@ function MainLayout() {
 
             case 'history': return t('sidebar.history');
             case 'room-rates': return 'Room Rates';
+            case 'staff-schedule': return 'Staff Schedule';
             default: return t('dashboard.title');
         }
     };
@@ -127,6 +131,14 @@ function MainLayout() {
                     >
                         <span className="nav-icon">💰</span>
                         Rates
+                    </button>
+
+                    <button
+                        className={`nav-item ${activeTab === 'staff-schedule' ? 'active' : ''}`}
+                        onClick={() => handleNavClick('staff-schedule')}
+                    >
+                        <span className="nav-icon">👨‍💼</span>
+                        Staff
                     </button>
 
                 </nav>

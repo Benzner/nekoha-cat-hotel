@@ -1,0 +1,295 @@
+/* Employee Schedule Container */
+.employee-schedule-container {
+    display: flex;
+    flex-direction: column;
+    /* ALWAYS column now */
+    gap: 1.5rem;
+    height: calc(100vh - 100px);
+    padding: 1rem;
+    overflow-y: auto;
+    /* Allow full page scroll */
+}
+
+/* Sidebar - Employee List (Now Header Area) */
+.schedule-sidebar {
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: row;
+    /* Horizontal layout */
+    align-items: center;
+    gap: 1rem;
+    min-height: 120px;
+    /* Ensure enough height for items */
+    overflow-x: auto;
+    /* Scroll horizontally if many employees */
+}
+
+.staff-list-container {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    /* Space for scrollbar */
+    align-items: center;
+}
+
+.schedule-sidebar-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 120px;
+    margin-right: 1rem;
+    border-right: 2px solid var(--border-light);
+    padding-right: 1rem;
+}
+
+.schedule-sidebar h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.employee-draggable {
+    background: var(--surface-light);
+    border: 1px solid var(--border-light);
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    cursor: grab;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    min-width: 150px;
+    /* Wider for landscape */
+    position: relative;
+    user-select: none;
+}
+
+.employee-draggable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary);
+}
+
+.employee-draggable:active {
+    cursor: grabbing;
+}
+
+.employee-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.employee-info {
+    flex: 1;
+}
+
+.employee-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.employee-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+}
+
+.employee-draggable:hover .employee-actions {
+    opacity: 1;
+}
+
+.action-btn-mini {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.action-btn-mini:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-add-staff {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+}
+
+/* Calendar Area */
+.schedule-calendar-area {
+    flex: 1;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.schedule-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    flex: 1;
+    overflow-y: auto;
+}
+
+.schedule-day-header {
+    background: var(--surface-light);
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.schedule-day-cell {
+    background: white;
+    min-height: 100px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.schedule-day-cell.droppable-hover {
+    background-color: var(--primary-light);
+}
+
+.schedule-day-cell.today {
+    background-color: #fff8f0;
+    /* Very light orange */
+}
+
+.day-number {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-align: right;
+    display: block;
+}
+
+.schedule-day-cell.other-month {
+    background-color: #f9fafb;
+    opacity: 0.7;
+}
+
+/* Scheduled Employee Item in Calendar */
+.scheduled-employee {
+    background: var(--surface-light);
+    border: 1px solid var(--border-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scheduled-employee.is-dragging {
+    opacity: 0.5;
+}
+
+.remove-employee-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 0.25rem;
+    line-height: 1;
+    opacity: 0.6;
+}
+
+.remove-employee-btn:hover {
+    color: var(--danger);
+    opacity: 1;
+}
+
+/* Modal Form Styles */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Mobile Adjustments (still needed for very small screens) */
+@media (max-width: 480px) {
+    .schedule-sidebar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .schedule-sidebar-header {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+        margin-right: 0;
+        margin-bottom: 1rem;
+        padding-right: 0;
+        padding-bottom: 0.5rem;
+    }
+
+    .staff-list-container {
+        flex-wrap: nowrap;
+        /* Keep horizontal scroll */
+    }
+}
